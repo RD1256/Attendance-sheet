@@ -1,0 +1,34 @@
+<!-- admin-panel.html -->
+<h3>Add New Person & Generate Barcode</h3>
+<input type="text" id="newName" placeholder="Enter Full Name">
+<button onclick="addPerson()">Add Person and Generate Barcode</button>
+<div id="result"></div>
+
+<script>
+    // IMPORTANT: This function would call a Google Apps Script URL
+    // that you create. It acts as the secure middleman to your sheet.
+    async function addPerson() {
+        const name = document.getElementById('newName').value;
+        if (!name) {
+            alert('Please enter a name.');
+            return;
+        }
+
+        // This is the URL of your Google Apps Script web app
+        const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+        const response = await fetch(GOOGLE_SCRIPT_URL + `?action=addPerson&name=${name}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            document.getElementById('result').innerHTML = `
+                <p>Successfully added ${name}!</p>
+                <p>Unique ID: ${result.uniqueID}</p>
+                <p>Barcode:</p>
+                <img src="${result.barcodeUrl}" alt="barcode">
+            `;
+        } else {
+            document.getElementById('result').innerText = 'Error: Could not add person.';
+        }
+    }
+</script>
